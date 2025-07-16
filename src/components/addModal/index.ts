@@ -1,1 +1,1 @@
-export { AddEditSkillModal } from './addModal';
+export { AddModal } from './addModal';

@@ -1,58 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { Modal, Input, Form } from 'antd';
 
-interface AddEditSkillModalProps {
-  open: boolean;
+import { Button, Form, Input, Modal } from 'antd';
+import { useCreateSkill } from '../../pages/Skills/services/mutation/useCreateSkill';
+import { useEffect } from 'react';
+
+interface Props {
+  isOpen: boolean;
   onClose: () => void;
-  onSubmit: (values: { name: string; description?: string }) => void;
-  initialValues?: { name: string; description?: string };
-  isEdit?: boolean;
-  loading?: boolean;
+  record?: any | null;
 }
 
-export const AddEditSkillModal: React.FC<AddEditSkillModalProps> = ({
-  open,
-  onClose,
-  onSubmit,
-  initialValues,
-  isEdit = false,
-  loading = false,
-}) => {
+// interface FormValues {
+//   name: string;
+//   description: string;
+// }
+
+export const AddModal = ({ isOpen, onClose, record }: Props) => {
   const [form] = Form.useForm();
+  const { mutate } = useCreateSkill();
 
   useEffect(() => {
-    if (open) {
-      form.setFieldsValue(initialValues || { name: '', description: '' });
+    if (record) {
+      form.setFieldsValue({
+        name: record.skill?.name || '',
+        description: record.skill?.description || '',
+      });
+    } else {
+      form.resetFields();
     }
-  }, [open, initialValues, form]);
+  }, [record, form]);
+
+  const handleSubmit = (values: any) => {
+    mutate(values, {
+      onSuccess: () => {
+        console.log('Skill created');
+        onClose();
+        form.resetFields();
+      },
+      onError: (error) => {
+        console.error('Error creating skill:', error);
+      },
+    });
+  };
 
   return (
     <Modal
-      open={open}
+      footer={null}
+      title={record ? 'Update Skill' : 'Create Skill'}
+      open={isOpen}
       onCancel={onClose}
-      onOk={() => form.submit()}
-      okText={isEdit ? 'Save' : 'Add'}
-      confirmLoading={loading}
-      title={isEdit ? 'Edit Skill' : 'Add Skill'}
-      centered
-      destroyOnClose
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={onSubmit}
-        initialValues={initialValues || { name: '', description: '' }}
-      >
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
-          label="Skill Name"
           name="name"
-          rules={[{ required: true, message: 'Please enter skill name' }]}
+          label="Name"
+          rules={[{ required: true, message: 'Please enter a name' }]}
         >
-          <Input placeholder="Enter skill name" />
+          <Input placeholder="Enter name" />
         </Form.Item>
-        <Form.Item label="Description" name="description">
-          <Input.TextArea placeholder="Enter description (optional)" autoSize={{ minRows: 2, maxRows: 4 }} />
+        <Form.Item
+          name="description"
+          label="Description"
+          rules={[{ required: true, message: 'Please enter a description' }]}
+        >
+          <Input.TextArea placeholder="Enter description" />
         </Form.Item>
+        <Button type="primary" className="w-full" htmlType="submit">
+          {record ? 'Update' : 'Create'}
+        </Button>
       </Form>
     </Modal>
   );
