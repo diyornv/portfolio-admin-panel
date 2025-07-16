@@ -3,6 +3,10 @@ import { Layout } from './layout';
 import { Auth } from './pages/Auth';
 import { useAuthStore } from './store/auth';
 import React from 'react';
+import { Skills } from './pages/Skills';
+import { Socials } from './pages/Socials';
+import { Projects } from './pages/Projects';
+import { Logo } from './pages/Logo';
 
 function Dashboard() {
   return (
@@ -25,7 +29,10 @@ export default function App() {
         <Layout>
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            {/* Boshqa sahifalar uchun route'lar keyin qo'shiladi */}
+            <Route path="/skills" element={<Skills />} />
+            <Route path="/socials" element={<Socials />} />
+            <Route path="/projects" element={<Projects />} />
+            <Route path="/logo" element={<Logo />} />
           </Routes>
         </Layout>
       ) : (
