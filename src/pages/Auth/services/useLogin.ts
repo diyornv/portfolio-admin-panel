@@ -6,10 +6,10 @@ type LoginData = {
     password: string;
 }
 
-
 export const useLogin = () => {
     return useMutation({
         mutationKey: ['login'],
-        mutationFn: (data: LoginData) => request.post("/auth/login", data).then((res) => res.data),
+        mutationFn: (data: LoginData) =>
+            request.post("/.netlify/functions/login", data).then((res) => res.data),
     })
 }
