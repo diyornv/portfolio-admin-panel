@@ -19,18 +19,18 @@ export default function App() {
     checkAuth();
   }, [checkAuth]);
 
-  if (!isAuthenticated) {
-    return <Auth />;
-  }
-
   return (
     <BrowserRouter>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          {/* Boshqa sahifalar uchun route'lar keyin qo'shiladi */}
-        </Routes>
-      </Layout>
+      {isAuthenticated ? (
+        <Layout>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            {/* Boshqa sahifalar uchun route'lar keyin qo'shiladi */}
+          </Routes>
+        </Layout>
+      ) : (
+        <Auth />
+      )}
     </BrowserRouter>
   );
 }
