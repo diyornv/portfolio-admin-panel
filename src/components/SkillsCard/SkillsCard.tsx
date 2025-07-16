@@ -1,4 +1,3 @@
-import { Button, Card, Typography } from 'antd';
 import { DeleteIcon, Edit2Icon } from 'lucide-react';
 
 interface Props {
