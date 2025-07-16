@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import request from "../../../config/requests";
+import axios from "axios";
 
 type LoginData = {
     email: string;
@@ -10,6 +10,6 @@ export const useLogin = () => {
     return useMutation({
         mutationKey: ['login'],
         mutationFn: (data: LoginData) =>
-            request.post("/.netlify/functions/login", data).then((res) => res.data),
+            axios.post("/.netlify/functions/login", data).then((res) => res.data),
     })
 }
