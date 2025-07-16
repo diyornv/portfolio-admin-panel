@@ -10,7 +10,7 @@ const menu = [
   { label: 'Logo', icon: <Smile size={20} />, to: '/logo' },
 ];
 
-export function Sidebar() {
+export function Sidebar({ collapsed = false }: { collapsed?: boolean }) {
   const navigate = useNavigate();
   const { logout } = useAuthStore();
 
@@ -20,10 +20,17 @@ export function Sidebar() {
   };
 
   return (
-    <aside className="flex flex-col h-full w-56 bg-[#0a1a2f] text-white p-4 justify-between">
+    <aside
+      className={`flex flex-col h-full ${collapsed ? 'w-20' : 'w-56'} bg-[#0a1a2f] text-white p-4 justify-between transition-all duration-300`}
+    >
       <div>
-        <div className="flex items-center gap-2 mb-8">
-          <span className="text-2xl font-bold bg-white/10 px-3 py-2 rounded-lg">Admin Panel</span>
+        <div className={`flex items-center gap-2 mb-8 ${collapsed ? 'justify-center' : ''}`}>
+          {!collapsed && (
+            <span className="text-2xl font-bold bg-white/10 px-3 py-2 rounded-lg">Admin Panel</span>
+          )}
+          {collapsed && (
+            <span className="text-2xl font-bold bg-white/10 px-3 py-2 rounded-lg">A</span>
+          )}
         </div>
         <nav className="flex flex-col gap-2">
           {menu.map((item) => (
@@ -31,23 +38,29 @@ export function Sidebar() {
               key={item.label}
               to={item.to}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-4 py-2 rounded-lg transition-colors font-medium text-base hover:bg-white/10 ${
+                `flex items-center ${collapsed ? 'justify-center' : 'gap-3 px-4'} py-2 rounded-lg transition-colors font-medium text-base hover:bg-white/10 ${
                   isActive ? 'bg-blue-600 text-white' : 'text-white/80'
                 }`
               }
               end
             >
               {item.icon}
-              {item.label}
+              {!collapsed && item.label}
             </NavLink>
           ))}
         </nav>
       </div>
       <div className="flex flex-col gap-2">
-        <button onClick={handleLogout} className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors">
-          <LogOut size={18} /> Logout
+        <button
+          onClick={handleLogout}
+          className={`flex items-center ${collapsed ? 'justify-center' : 'gap-2 px-4'} py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors`}
+        >
+          <LogOut size={18} />
+          {!collapsed && 'Logout'}
         </button>
-        <div className="text-xs text-white/50 px-4 py-2 rounded-lg bg-white/5 mt-2">Version 1.0.0</div>
+        <div className={`text-xs text-white/50 py-2 rounded-lg bg-white/5 mt-2 ${collapsed ? 'text-center px-0' : 'px-4'}`}>
+          {collapsed ? 'v1.0' : 'Version 1.0.0'}
+        </div>
       </div>
     </aside>
   );
