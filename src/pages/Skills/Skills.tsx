@@ -1,66 +1,42 @@
 import React, { useState } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getSkills, addSkills, updateSkill, deleteSkill } from '../../api/skills';
+import { useGetSkills } from './services/query/useGetSkills';
+import { useCreateSkill } from './services/mutation/useCreateSkill';
+// import { useUpdateSkill } from './services/mutation/useUpdateSkill';
+// import { useDeleteSkill } from './services/mutation/useDeleteSkill';
 import { SkillsCard } from '../../components/SkillsCard';
 import { AddEditSkillModal } from '../../components/addModal';
 import { Button, message, Spin } from 'antd';
 import { Plus } from 'lucide-react';
 
 export const Skills = () => {
-  const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   const [editSkill, setEditSkill] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
 
-  // Fetch all skills
-  const { data: skills = [], isLoading } = useQuery({
-    queryKey: ['skills'],
-    queryFn: getSkills,
-  });
+  // Get all skills
+  const { data: skills = [], isLoading, refetch } = useGetSkills();
 
-  // Add skill
-  const addMutation = useMutation({
-    mutationFn: addSkills,
-    onSuccess: () => {
-      message.success('Skill(s) added!');
-      queryClient.invalidateQueries({ queryKey: ['skills'] });
-      setModalOpen(false);
-    },
-    onError: () => message.error('Failed to add skill'),
-  });
+  // Create skill
+  const createSkill = useCreateSkill();
 
-  // Edit skill
-  const editMutation = useMutation({
-    mutationFn: ({ id, data }: any) => updateSkill(id, data),
-    onSuccess: () => {
-      message.success('Skill updated!');
-      queryClient.invalidateQueries({ queryKey: ['skills'] });
-      setEditSkill(null);
-    },
-    onError: () => message.error('Failed to update skill'),
-  });
-
-  // Delete skill
-  const deleteMutation = useMutation({
-    mutationFn: deleteSkill,
-    onSuccess: () => {
-      message.success('Skill deleted!');
-      queryClient.invalidateQueries({ queryKey: ['skills'] });
-    },
-    onError: () => message.error('Failed to delete skill'),
-  });
+  // TODO: Uncomment and implement these if you have update/delete hooks
+  // const updateSkill = useUpdateSkill();
+  // const deleteSkill = useDeleteSkill();
 
   // Modal submit handler
   const handleModalSubmit = (values: { name: string; description?: string }) => {
-    setLoading(true);
     if (editSkill) {
-      editMutation.mutate({ id: editSkill.id, data: values }, {
-        onSettled: () => setLoading(false),
-      });
+      // updateSkill.mutate({ id: editSkill.id, data: values }, { onSuccess: refetch });
+      message.info('Edit skill is not implemented in this demo.');
+      setEditSkill(null);
+      setModalOpen(false);
     } else {
-      // To‘g‘ri formatda yuborish
-      addMutation.mutate([{ name: values.name, description: values.description }], {
-        onSettled: () => setLoading(false),
+      createSkill.mutate(values, {
+        onSuccess: () => {
+          message.success('Skill added!');
+          setModalOpen(false);
+          refetch();
+        },
+        onError: () => message.error('Failed to add skill'),
       });
     }
   };
@@ -70,7 +46,7 @@ export const Skills = () => {
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-4xl font-bold mb-1">Skills</h1>
-          <div className="text-gray-400">ASDJASD</div>
+          <div className="text-gray-400">add skills</div>
         </div>
         <Button
           type="primary"
@@ -94,7 +70,8 @@ export const Skills = () => {
                 name={skill.name}
                 description={skill.description}
                 onEdit={() => setEditSkill(skill)}
-                onDelete={() => deleteMutation.mutate(skill.id)}
+                onDelete={() => message.info('Delete skill is not implemented in this demo.')}
+                // To implement delete: onDelete={() => deleteSkill.mutate(skill.id, { onSuccess: refetch })}
               />
             ))
           ) : (
@@ -112,7 +89,7 @@ export const Skills = () => {
         onSubmit={handleModalSubmit}
         initialValues={editSkill ? { name: editSkill.name, description: editSkill.description } : undefined}
         isEdit={!!editSkill}
-        loading={loading}
+        loading={createSkill.isLoading}
       />
     </div>
   );
